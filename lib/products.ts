@@ -106,3 +106,54 @@ export async function updateProductStock(
         return { success: false, error: "Failed to update product stock" };
     }
 }
+
+export default async function deleteProduct(id: number) {
+    try {
+        const validatedId = z
+            .number()
+            .refine((val) => Number.isInteger(val) && val > 0, {
+                message: "Product ID must be a positive integer",
+            })
+            .parse(id);
+
+        await db.delete(productsTable).where(eq(productsTable.id, validatedId));
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            console.error("Invalid product ID:", error.issues);
+            throw new Error("Invalid product ID provided");
+        } else {
+            console.error("Failed to fetch product:", error);
+            throw new Error("Failed to fetch product");
+        }
+    }
+}
+
+export async function updateProduct(id: number, formData: FormData) {
+    try {
+        const name = formData.get("name") as string;
+        const description = formData.get("description") as string;
+        const categoryId = parseInt(formData.get("category") as string);
+        const price = parseFloat(formData.get("price") as string);
+        const configuration = formData.get("configuration") as string;
+        const mainImageUrl = formData.get("image_url") as string;
+        const additionalImages = formData.get("images_url") as string;
+
+        await db
+            .update(productsTable)
+            .set({
+                categoryId,
+                name,
+                imageUrl: mainImageUrl,
+                noneMainImagesUrl: JSON.stringify(additionalImages.split(",")),
+                description,
+                configuration,
+                price: price,
+            })
+            .where(eq(productsTable.id, id));
+
+        return { success: true, product: null };
+    } catch (error) {
+        console.error("Failed to update product:", error);
+        return { success: false, error: "Failed to update product" };
+    }
+}

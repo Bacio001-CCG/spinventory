@@ -77,7 +77,11 @@ export default function Page() {
                 </Button>
                 <Link
                     target="_blank"
-                    href={"/dashboard/inventory/" + params["product-id"]}
+                    href={
+                        process.env.NEXT_PUBLIC_MAIN_WEBSITE_URL +
+                        "/product/" +
+                        params["product-id"]
+                    }
                 >
                     <Button className="w-full" variant={"secondary"}>
                         Product Info

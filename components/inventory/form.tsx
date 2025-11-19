@@ -10,41 +10,69 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { SelectCategory } from "@/database/schema";
+import { SelectCategory, SelectProduct } from "@/database/schema";
 import { UploadButton } from "@/utils/uploadthing";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { createProduct } from "@/lib/products";
+import { createProduct, updateProduct } from "@/lib/products";
 import { toast } from "react-toastify";
+
+type ProductFormProps = {
+    categories: SelectCategory[];
+    product?: SelectProduct;
+    onSuccess?: () => void;
+};
 
 export default function InventoryForm({
     categories,
-}: {
-    categories: SelectCategory[];
-}) {
-    const [mainImage, setMainImage] = useState<string | null>(null);
-    const [subImages, setSubImages] = useState<string[]>([]);
+    product,
+    onSuccess,
+}: ProductFormProps) {
+    const [mainImage, setMainImage] = useState<string | null>(
+        product?.imageUrl ?? null
+    );
+    const [subImages, setSubImages] = useState<string[]>(
+        product?.noneMainImagesUrl ? product.noneMainImagesUrl.split(",") : []
+    );
+    const [loading, setLoading] = useState(false);
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
+        setLoading(true);
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
 
+        // Add images to formData
+        formData.set("image_url", mainImage ?? "");
+        formData.set("images_url", subImages.join(","));
+
         try {
-            const result = await createProduct(formData);
+            let result;
+            if (product) {
+                // Edit mode
+                result = await updateProduct(product.id, formData);
+            } else {
+                // Create mode
+                result = await createProduct(formData);
+            }
 
             if (result.success) {
-                form.reset(); // Reset form on success
-                setMainImage(null);
-                setSubImages([]);
-                toast.success("Product created successfully!");
+                form.reset();
+                if (!product) setMainImage(null);
+                if (!product) setSubImages([]);
+                toast.success(
+                    product
+                        ? "Product updated successfully!"
+                        : "Product created successfully!"
+                );
+                if (onSuccess) onSuccess();
             } else {
-                console.error("Failed to create product:", result.error);
-                toast.error("Failed to create product.");
+                toast.error(result.error || "Failed to save product.");
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
-            toast.error("An error occurred while creating the product.");
+            toast.error("An error occurred while saving the product.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -70,6 +98,7 @@ export default function InventoryForm({
                         type="text"
                         name="name"
                         placeholder="Product Name"
+                        defaultValue={product?.name}
                     />
                 </div>
                 <div className="flex flex-col gap-3">
@@ -78,11 +107,16 @@ export default function InventoryForm({
                         required
                         name="description"
                         placeholder="Product Description"
+                        defaultValue={product?.description}
                     />
                 </div>
                 <div className="flex flex-col gap-3">
                     <Label>Category</Label>
-                    <Select required name="category">
+                    <Select
+                        required
+                        name="category"
+                        defaultValue={product?.categoryId.toString()}
+                    >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
@@ -107,6 +141,7 @@ export default function InventoryForm({
                         type="number"
                         name="price"
                         placeholder="Product Price"
+                        defaultValue={product?.price}
                     />
                 </div>
                 <div className="flex flex-col gap-3">
@@ -114,10 +149,11 @@ export default function InventoryForm({
                     <Textarea
                         name="configuration"
                         placeholder="Product Configuration"
+                        defaultValue={product?.configuration}
                     />
                 </div>
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="terms">Front image</Label>{" "}
+                    <Label htmlFor="terms">Front image</Label>
                     <div
                         style={{
                             backgroundImage: mainImage
@@ -134,7 +170,6 @@ export default function InventoryForm({
                                 setMainImage(res[0].ufsUrl);
                             }}
                             onUploadError={(error: Error) => {
-                                // Do something with the error.
                                 alert(`ERROR! ${error.message}`);
                             }}
                         />
@@ -142,7 +177,7 @@ export default function InventoryForm({
                 </div>
                 <div className="flex gap-10">
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="terms">Sub images</Label>{" "}
+                        <Label htmlFor="terms">Sub images</Label>
                         <div className="flex gap-10 overflow-x-auto w-3/4 relative">
                             <div className="h-[20rem] w-[20rem] border border-border rounded-lg flex items-center justify-center flex-shrink-0">
                                 <UploadButton
@@ -160,7 +195,7 @@ export default function InventoryForm({
                                 />
                             </div>
                             {subImages.length > 0 &&
-                                subImages.reverse().map((img, index) => (
+                                [...subImages].reverse().map((img, index) => (
                                     <div
                                         key={index}
                                         style={{
@@ -174,8 +209,12 @@ export default function InventoryForm({
                         </div>
                     </div>
                 </div>
-                <Button type="submit" className="">
-                    Create Product
+                <Button type="submit" disabled={loading}>
+                    {loading
+                        ? "Saving..."
+                        : product
+                        ? "Update Product"
+                        : "Create Product"}
                 </Button>
             </form>
         </div>

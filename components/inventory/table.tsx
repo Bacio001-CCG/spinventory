@@ -43,11 +43,13 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { productSchema } from "@/validation/product";
-import { getProducts } from "@/lib/products";
+import deleteProduct, { getProducts } from "@/lib/products";
 import { z } from "zod";
 import Image from "next/image";
 import QRCode from "./qr";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
     {
@@ -125,6 +127,7 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
         enableHiding: false,
         cell: ({ row }) => {
             const product = row.original;
+            const router = useRouter();
 
             return (
                 <div className="float-end flex gap-3">
@@ -142,7 +145,8 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
                             <DropdownMenuItem>
                                 <QRCode
                                     data={
-                                        process.env.NEXT_PUBLIC_WEBHOOK_URL +
+                                        process.env
+                                            .NEXT_PUBLIC_ADMIN_WEBSITE_URL +
                                         "/dashboard/qr/" +
                                         product.id.toString()
                                     }
@@ -152,7 +156,8 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
                             <DropdownMenuItem>
                                 <Link
                                     href={
-                                        process.env.NEXT_PUBLIC_WEBHOOK_URL +
+                                        process.env
+                                            .NEXT_PUBLIC_ADMIN_WEBSITE_URL +
                                         "/dashboard/qr/" +
                                         product.id.toString()
                                     }
@@ -181,18 +186,54 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem
-                                onClick={() =>
+                                onClick={() => {
                                     navigator.clipboard.writeText(
                                         product.id.toString()
-                                    )
-                                }
+                                    );
+                                    toast.success(
+                                        "Product ID copied to clipboard"
+                                    );
+                                }}
                             >
                                 Copy product ID
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>View customer</DropdownMenuItem>
-                            <DropdownMenuItem>
-                                View product details
+                            <Link
+                                href={
+                                    "/dashboard/inventory/" +
+                                    product.id +
+                                    "/edit"
+                                }
+                            >
+                                <DropdownMenuItem>
+                                    Edit product
+                                </DropdownMenuItem>
+                            </Link>
+                            <Link
+                                target="_blank"
+                                href={
+                                    process.env.NEXT_PUBLIC_MAIN_WEBSITE_URL +
+                                    "/product/" +
+                                    product.id
+                                }
+                            >
+                                <DropdownMenuItem>
+                                    Go to product
+                                </DropdownMenuItem>
+                            </Link>
+                            <DropdownMenuItem
+                                onClick={async () => {
+                                    const conf = confirm(
+                                        "Are you sure you want to delete this product?"
+                                    );
+                                    if (conf) {
+                                        await deleteProduct(product.id);
+                                        toast.success("Product deleted");
+                                        router.refresh();
+                                    }
+                                }}
+                            >
+                                Delete Product
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
