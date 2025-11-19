@@ -52,30 +52,30 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+    // {
+    //     id: "select",
+    //     header: ({ table }) => (
+    //         <Checkbox
+    //             checked={
+    //                 table.getIsAllPageRowsSelected() ||
+    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
+    //             }
+    //             onCheckedChange={(value) =>
+    //                 table.toggleAllPageRowsSelected(!!value)
+    //             }
+    //             aria-label="Select all"
+    //         />
+    //     ),
+    //     cell: ({ row }) => (
+    //         <Checkbox
+    //             checked={row.getIsSelected()}
+    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //             aria-label="Select row"
+    //         />
+    //     ),
+    //     enableSorting: false,
+    //     enableHiding: false,
+    // },
     {
         accessorKey: "photo",
         header: "",
@@ -117,7 +117,19 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
     },
     {
         accessorKey: "price",
-        header: "Price",
+        header: ({ column }) => {
+            return (
+                <button
+                    className="flex items-center gap-2"
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === "asc")
+                    }
+                >
+                    Price
+                    <ArrowUpDown className="scale-50 -ml-2" />
+                </button>
+            );
+        },
         cell: ({ row }) => (
             <div className="lowercase">€ {row.getValue("price")}</div>
         ),

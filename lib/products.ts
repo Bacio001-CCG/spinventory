@@ -4,10 +4,13 @@ import { db } from "@/database/connect";
 import { productsTable, SelectProduct } from "@/database/schema";
 import { productSchema } from "@/validation/product";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export async function getProducts(): Promise<z.infer<typeof productSchema>[]> {
-    const products = await db.select().from(productsTable);
+    const products = await db
+        .select()
+        .from(productsTable)
+        .orderBy(desc(productsTable.createdAt));
 
     return products.reduce<z.infer<typeof productSchema>[]>(
         (validProducts, product) => {
@@ -35,7 +38,8 @@ export async function getProduct(id: number): Promise<SelectProduct | null> {
         const [product] = await db
             .select()
             .from(productsTable)
-            .where(eq(productsTable.id, validatedId));
+            .where(eq(productsTable.id, validatedId))
+            .orderBy(desc(productsTable.createdAt));
 
         return product || null;
     } catch (error) {

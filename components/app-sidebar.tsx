@@ -60,8 +60,8 @@ const data = {
             icon: DollarSignIcon,
         },
         {
-            title: "Invoicing",
-            url: "/dashboard/invoicing",
+            title: "Invoices",
+            url: "/dashboard/invoices",
             icon: IconInvoice,
         },
     ],
