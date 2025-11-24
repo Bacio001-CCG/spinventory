@@ -52,6 +52,16 @@ import {
     orderSchema,
     orderWithCustomerandOrderItemsSchema,
 } from "@/validation/order";
+import { Badge } from "../ui/badge";
+import { OrderStatus } from "@/enums";
+import {
+    IconCheck,
+    IconLoader,
+    IconMoneybag,
+    IconTruckDelivery,
+    IconWalk,
+    IconX,
+} from "@tabler/icons-react";
 
 export const columns: ColumnDef<
     z.infer<typeof orderWithCustomerandOrderItemsSchema>
@@ -60,14 +70,53 @@ export const columns: ColumnDef<
         accessorKey: "id",
         header: "Order ID",
         cell: ({ row }) => (
-            <div className="capitalize">{row.original.orders.id}</div>
+            <div className="capitalize">#{row.original.orders.id}</div>
         ),
+    },
+    {
+        accessorKey: "customerEmail",
+        header: "Customer Email",
+        cell: ({ row }) => <div>{row.original.customers.email}</div>,
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Created At",
+        cell: ({ row }) => {
+            const date = new Date(row.original.orders.createdAt);
+            return (
+                <div>
+                    {date.getUTCDate() - 1}/{date.getUTCMonth() + 1}/
+                    {date.getUTCFullYear()}
+                </div>
+            );
+        },
     },
     {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => (
-            <div className="lowercase">{row.original.orders.status}</div>
+            <Badge variant="outline" className="text-muted-foreground px-1.5">
+                {row.original.orders.status === OrderStatus.Paid && (
+                    <IconMoneybag className="fill-yellow-500 dark:fill-yellow-400 mt-0.5" />
+                )}
+                {row.original.orders.status === OrderStatus.Pending && (
+                    <IconLoader className="fill-gray-500 dark:fill-gray-400 mt-0.5" />
+                )}
+                {row.original.orders.status === OrderStatus.Cancelled && (
+                    <IconX className="fill-red-500 dark:fill-red-400 mt-0.5" />
+                )}
+                {row.original.orders.status === OrderStatus.Shipped && (
+                    <IconTruckDelivery className="fill-purple-500 dark:fill-purple-400 mt-0.5" />
+                )}
+                {row.original.orders.status === OrderStatus.Processing && (
+                    <IconWalk className="fill-orange-500 dark:fill-orange-400 mt-0.5" />
+                )}
+                {row.original.orders.status === OrderStatus.Finished && (
+                    <IconCheck className="fill-green-500 dark:fill-green-400 mt-0.5" />
+                )}
+
+                {row.original.orders.status}
+            </Badge>
         ),
     },
     {
