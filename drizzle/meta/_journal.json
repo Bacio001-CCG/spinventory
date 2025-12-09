@@ -22,6 +22,13 @@
       "when": 1763417594090,
       "tag": "0002_mushy_thunderbird",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1765247182541,
+      "tag": "0003_brave_shooting_star",
+      "breakpoints": true
     }
   ]
 }

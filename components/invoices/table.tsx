@@ -112,7 +112,7 @@ export function DataTable({ data }: { data: SalesInvoice[] }) {
     });
 
     return (
-        <div className="w-full">
+        <div className="w-full lg:w-3/4 mx-auto mt-10 px-4 lg:px-6">
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter name..."
@@ -145,10 +145,10 @@ export function DataTable({ data }: { data: SalesInvoice[] }) {
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     );
                                 })}

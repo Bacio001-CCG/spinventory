@@ -5,6 +5,8 @@ import { productsTable, SelectProduct } from "@/database/schema";
 import { productSchema } from "@/validation/product";
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
+import { logAuditEvent } from "./audit-log";
+import { AuditLogAction } from "@/enums";
 
 export async function getProducts(): Promise<z.infer<typeof productSchema>[]> {
     const products = await db
@@ -55,6 +57,7 @@ export async function getProduct(id: number): Promise<SelectProduct | null> {
 
 export async function createProduct(formData: FormData) {
     try {
+        await logAuditEvent(AuditLogAction.Create, `product: ${formData.get("name")}`);
         // Get other form data
         const name = formData.get("name") as string;
         const description = formData.get("description") as string;
@@ -86,6 +89,8 @@ export async function updateProductStock(
     action: "add" | "remove" = "add"
 ) {
     try {
+        await logAuditEvent(AuditLogAction.Update, `product stock: ${productId}`);
+
         const product = await getProduct(productId);
         if (!product) {
             throw new Error("Product not found");
@@ -113,6 +118,8 @@ export async function updateProductStock(
 
 export default async function deleteProduct(id: number) {
     try {
+        await logAuditEvent(AuditLogAction.Delete, `product: ${id}`);
+
         const validatedId = z
             .number()
             .refine((val) => Number.isInteger(val) && val > 0, {
@@ -134,6 +141,8 @@ export default async function deleteProduct(id: number) {
 
 export async function updateProduct(id: number, formData: FormData) {
     try {
+        await logAuditEvent(AuditLogAction.Update, `product: ${id}`);
+
         const name = formData.get("name") as string;
         const description = formData.get("description") as string;
         const categoryId = parseInt(formData.get("category") as string);

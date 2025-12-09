@@ -11,3 +11,13 @@ export enum DeliveryMethod {
     Delivery = "delivery",
     Pickup = "pickup",
 }
+
+export enum AuditLogAction {
+    Create = "create",
+    Update = "update",
+    Delete = "delete",
+    View = "view",
+    Login = "login",
+    Logout = "logout",
+    Signup = "signup",
+}

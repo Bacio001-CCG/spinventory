@@ -21,6 +21,7 @@ export async function getInvoices(): Promise<SalesInvoice[]> {
             }
         );
     } catch (err) {
+        console.error("Error fetching invoices:", err);
         throw new Error("Failed to fetch invoices");
     }
 }

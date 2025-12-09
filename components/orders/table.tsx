@@ -13,27 +13,8 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table";
-import {
-    ArrowUpDown,
-    ChevronDown,
-    MoreHorizontal,
-    Plus,
-    QrCode,
-    SquareArrowOutUpRight,
-} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
     Table,
     TableBody,
@@ -42,14 +23,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { productSchema } from "@/validation/product";
 import { z } from "zod";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { SalesInvoice } from "@/types";
 import {
-    orderSchema,
     orderWithCustomerandOrderItemsSchema,
 } from "@/validation/order";
 import { Badge } from "../ui/badge";
@@ -66,69 +41,69 @@ import {
 export const columns: ColumnDef<
     z.infer<typeof orderWithCustomerandOrderItemsSchema>
 >[] = [
-    {
-        accessorKey: "id",
-        header: "Order ID",
-        cell: ({ row }) => (
-            <div className="capitalize">#{row.original.orders.id}</div>
-        ),
-    },
-    {
-        accessorKey: "customerEmail",
-        header: "Customer Email",
-        cell: ({ row }) => <div>{row.original.customers.email}</div>,
-    },
-    {
-        accessorKey: "createdAt",
-        header: "Created At",
-        cell: ({ row }) => {
-            const date = new Date(row.original.orders.createdAt);
-            return (
-                <div>
-                    {date.getUTCDate() - 1}/{date.getUTCMonth() + 1}/
-                    {date.getUTCFullYear()}
-                </div>
-            );
+        {
+            accessorKey: "id",
+            header: "Order ID",
+            cell: ({ row }) => (
+                <div className="capitalize">#{row.original.orders.id}</div>
+            ),
         },
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => (
-            <Badge variant="outline" className="text-muted-foreground px-1.5">
-                {row.original.orders.status === OrderStatus.Paid && (
-                    <IconMoneybag className="fill-yellow-500 dark:fill-yellow-400 mt-0.5" />
-                )}
-                {row.original.orders.status === OrderStatus.Pending && (
-                    <IconLoader className="fill-gray-500 dark:fill-gray-400 mt-0.5" />
-                )}
-                {row.original.orders.status === OrderStatus.Cancelled && (
-                    <IconX className="fill-red-500 dark:fill-red-400 mt-0.5" />
-                )}
-                {row.original.orders.status === OrderStatus.Shipped && (
-                    <IconTruckDelivery className="fill-purple-500 dark:fill-purple-400 mt-0.5" />
-                )}
-                {row.original.orders.status === OrderStatus.Processing && (
-                    <IconWalk className="fill-orange-500 dark:fill-orange-400 mt-0.5" />
-                )}
-                {row.original.orders.status === OrderStatus.Finished && (
-                    <IconCheck className="fill-green-500 dark:fill-green-400 mt-0.5" />
-                )}
+        {
+            accessorKey: "customerEmail",
+            header: "Customer Email",
+            cell: ({ row }) => <div>{row.original.customers.email}</div>,
+        },
+        {
+            accessorKey: "createdAt",
+            header: "Created At",
+            cell: ({ row }) => {
+                const date = new Date(row.original.orders.createdAt);
+                return (
+                    <div>
+                        {date.getUTCDate() - 1}/{date.getUTCMonth() + 1}/
+                        {date.getUTCFullYear()}
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => (
+                <Badge variant="outline" className="text-muted-foreground px-1.5">
+                    {row.original.orders.status === OrderStatus.Paid && (
+                        <IconMoneybag className="fill-yellow-500 dark:fill-yellow-400 mt-0.5" />
+                    )}
+                    {row.original.orders.status === OrderStatus.Pending && (
+                        <IconLoader className="fill-gray-500 dark:fill-gray-400 mt-0.5" />
+                    )}
+                    {row.original.orders.status === OrderStatus.Cancelled && (
+                        <IconX className="fill-red-500 dark:fill-red-400 mt-0.5" />
+                    )}
+                    {row.original.orders.status === OrderStatus.Shipped && (
+                        <IconTruckDelivery className="fill-purple-500 dark:fill-purple-400 mt-0.5" />
+                    )}
+                    {row.original.orders.status === OrderStatus.Processing && (
+                        <IconWalk className="fill-orange-500 dark:fill-orange-400 mt-0.5" />
+                    )}
+                    {row.original.orders.status === OrderStatus.Finished && (
+                        <IconCheck className="fill-green-500 dark:fill-green-400 mt-0.5" />
+                    )}
 
-                {row.original.orders.status}
-            </Badge>
-        ),
-    },
-    {
-        accessorKey: "deliveryMethod",
-        header: "Delivery Method",
-        cell: ({ row }) => (
-            <div className="lowercase">
-                {row.original.orders.deliveryMethod}
-            </div>
-        ),
-    },
-];
+                    {row.original.orders.status}
+                </Badge>
+            ),
+        },
+        {
+            accessorKey: "deliveryMethod",
+            header: "Delivery Method",
+            cell: ({ row }) => (
+                <div className="lowercase">
+                    {row.original.orders.deliveryMethod}
+                </div>
+            ),
+        },
+    ];
 
 export function DataTable({
     data,
@@ -162,7 +137,7 @@ export function DataTable({
     });
 
     return (
-        <div className="w-full">
+        <div className="w-full lg:w-3/4 mx-auto mt-10 px-4 lg:px-6">
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
@@ -174,10 +149,10 @@ export function DataTable({
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     );
                                 })}

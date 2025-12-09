@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./theme-toggle";
 import { usePathname } from "next/navigation";
-import BarcodeScan from "./barcode-scan";
 
 export function SiteHeader() {
     const pathname = usePathname();

@@ -42,16 +42,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { productSchema } from "@/validation/product";
-import deleteProduct, { getProducts } from "@/lib/products";
+import { categorySchema } from "@/validation/category";
 import { z } from "zod";
 import Image from "next/image";
-import QRCode from "./qr";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { deleteCategory } from "@/lib/categories";
 
-export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
+export const columns: ColumnDef<z.infer<typeof categorySchema>>[] = [
     // {
     //     id: "select",
     //     header: ({ table }) => (
@@ -97,96 +96,14 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
         ),
     },
     {
-        accessorKey: "quantityInStock",
-        header: ({ column }) => {
-            return (
-                <button
-                    className="flex items-center gap-2"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Quantity In Stock
-                    <ArrowUpDown className="scale-50 -ml-2" />
-                </button>
-            );
-        },
-        cell: ({ row }) => (
-            <div className="lowercase">{row.getValue("quantityInStock")}x</div>
-        ),
-    },
-    {
-        accessorKey: "price",
-        header: ({ column }) => {
-            return (
-                <button
-                    className="flex items-center gap-2"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Price
-                    <ArrowUpDown className="scale-50 -ml-2" />
-                </button>
-            );
-        },
-        cell: ({ row }) => (
-            <div className="lowercase">€ {row.getValue("price")}</div>
-        ),
-    },
-    {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const product = row.original;
+            const category = row.original;
             const router = useRouter();
 
             return (
                 <div className="float-end flex gap-3">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger
-                            asChild
-                            className="items-center justify-center"
-                        >
-                            <QrCode />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>
-                                Inventory Management
-                            </DropdownMenuLabel>
-                            <DropdownMenuItem>
-                                <QRCode
-                                    data={
-                                        process.env
-                                            .NEXT_PUBLIC_ADMIN_WEBSITE_URL +
-                                        "/dashboard/qr/" +
-                                        product.id.toString()
-                                    }
-                                    width={150}
-                                />
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Link
-                                    href={
-                                        process.env
-                                            .NEXT_PUBLIC_ADMIN_WEBSITE_URL +
-                                        "/dashboard/qr/" +
-                                        product.id.toString()
-                                    }
-                                    target="_blank"
-                                    className="w-full"
-                                >
-                                    <Button
-                                        variant="outline"
-                                        className="w-full"
-                                    >
-                                        Open{" "}
-                                        <SquareArrowOutUpRight className="text-white scale-75" />
-                                    </Button>
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -200,52 +117,40 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
                             <DropdownMenuItem
                                 onClick={() => {
                                     navigator.clipboard.writeText(
-                                        product.id.toString()
+                                        category.id.toString()
                                     );
                                     toast.success(
-                                        "Product ID copied to clipboard"
+                                        "Category ID copied to clipboard"
                                     );
                                 }}
                             >
-                                Copy product ID
+                                Copy category ID
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <Link
                                 href={
-                                    "/dashboard/inventory/" +
-                                    product.id +
+                                    "/dashboard/categories/" +
+                                    category.id +
                                     "/edit"
                                 }
                             >
                                 <DropdownMenuItem>
-                                    Edit product
-                                </DropdownMenuItem>
-                            </Link>
-                            <Link
-                                target="_blank"
-                                href={
-                                    process.env.NEXT_PUBLIC_MAIN_WEBSITE_URL +
-                                    "/product/" +
-                                    product.id
-                                }
-                            >
-                                <DropdownMenuItem>
-                                    Go to product
+                                    Edit category
                                 </DropdownMenuItem>
                             </Link>
                             <DropdownMenuItem
                                 onClick={async () => {
                                     const conf = confirm(
-                                        "Are you sure you want to delete this product?"
+                                        "Are you sure you want to delete this category?"
                                     );
                                     if (conf) {
-                                        await deleteProduct(product.id);
-                                        toast.success("Product deleted");
+                                        await deleteCategory(category.id);
+                                        toast.success("Category deleted");
                                         router.refresh();
                                     }
                                 }}
                             >
-                                Delete Product
+                                Delete Category
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -258,7 +163,7 @@ export const columns: ColumnDef<z.infer<typeof productSchema>>[] = [
 export function DataTable({
     data,
 }: {
-    data: Array<z.infer<typeof productSchema>>;
+    data: Array<z.infer<typeof categorySchema>>;
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -302,9 +207,9 @@ export function DataTable({
                     }
                     className="max-w-sm"
                 />
-                <Link href="/dashboard/inventory/create" className="ml-auto">
+                <Link href="/dashboard/categories/create" className="ml-auto">
                     <Button variant="outline">
-                        <Plus /> Add Product
+                        <Plus /> Add Category
                     </Button>
                 </Link>
             </div>

@@ -16,17 +16,16 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { createProduct, updateProduct } from "@/lib/products";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 type ProductFormProps = {
     categories: SelectCategory[];
     product?: SelectProduct;
-    onSuccess?: () => void;
 };
 
 export default function InventoryForm({
     categories,
     product,
-    onSuccess,
 }: ProductFormProps) {
     const [mainImage, setMainImage] = useState<string | null>(
         product?.imageUrl ?? null
@@ -35,6 +34,7 @@ export default function InventoryForm({
         product?.noneMainImagesUrl ? product.noneMainImagesUrl.split(",") : []
     );
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
@@ -65,7 +65,7 @@ export default function InventoryForm({
                         ? "Product updated successfully!"
                         : "Product created successfully!"
                 );
-                if (onSuccess) onSuccess();
+                router.push("/dashboard/inventory");
             } else {
                 toast.error(result.error || "Failed to save product.");
             }
@@ -77,8 +77,8 @@ export default function InventoryForm({
     }
 
     return (
-        <div className="px-4 lg:w-3/4 mx-auto">
-            <form onSubmit={handleSubmit} className="flex gap-5 flex-col">
+        <div className="px-4 lg:w-3/4 mx-auto  lg:px-6 mt-10">
+            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5">
                 <input
                     required
                     type="hidden"
@@ -99,15 +99,6 @@ export default function InventoryForm({
                         name="name"
                         placeholder="Product Name"
                         defaultValue={product?.name}
-                    />
-                </div>
-                <div className="flex flex-col gap-3">
-                    <Label>Description</Label>
-                    <Textarea
-                        required
-                        name="description"
-                        placeholder="Product Description"
-                        defaultValue={product?.description}
                     />
                 </div>
                 <div className="flex flex-col gap-3">
@@ -135,6 +126,14 @@ export default function InventoryForm({
                     </Select>
                 </div>
                 <div className="flex flex-col gap-3">
+                    <Label>Configuration</Label>
+                    <Textarea
+                        name="configuration"
+                        placeholder="Product Configuration"
+                        defaultValue={product?.configuration}
+                    />
+                </div>
+                <div className="flex flex-col gap-3">
                     <Label>Price</Label>
                     <Input
                         required
@@ -145,14 +144,15 @@ export default function InventoryForm({
                     />
                 </div>
                 <div className="flex flex-col gap-3">
-                    <Label>Configuration</Label>
+                    <Label>Description</Label>
                     <Textarea
-                        name="configuration"
-                        placeholder="Product Configuration"
-                        defaultValue={product?.configuration}
+                        required
+                        name="description"
+                        placeholder="Product Description"
+                        defaultValue={product?.description}
                     />
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 col-span-2">
                     <Label htmlFor="terms">Front image</Label>
                     <div
                         style={{
@@ -175,10 +175,10 @@ export default function InventoryForm({
                         />
                     </div>
                 </div>
-                <div className="flex gap-10">
-                    <div className="flex flex-col gap-3">
+                <div className="flex gap-10 col-span-2">
+                    <div className="flex flex-col gap-3 w-full">
                         <Label htmlFor="terms">Sub images</Label>
-                        <div className="flex gap-10 overflow-x-auto w-3/4 relative">
+                        <div className="flex gap-10 overflow-x-auto w-full relative">
                             <div className="h-[20rem] w-[20rem] border border-border rounded-lg flex items-center justify-center flex-shrink-0">
                                 <UploadButton
                                     endpoint="imageUploader"
@@ -209,12 +209,12 @@ export default function InventoryForm({
                         </div>
                     </div>
                 </div>
-                <Button type="submit" disabled={loading}>
+                <Button className="w-fit" type="submit" disabled={loading}>
                     {loading
                         ? "Saving..."
                         : product
-                        ? "Update Product"
-                        : "Create Product"}
+                            ? "Update Product"
+                            : "Create Product"}
                 </Button>
             </form>
         </div>

@@ -55,6 +55,11 @@ const data = {
             icon: BoxIcon,
         },
         {
+            title: "Categories",
+            url: "/dashboard/categories",
+            icon: IconFolder,
+        },
+        {
             title: "Orders",
             url: "/dashboard/orders",
             icon: DollarSignIcon,
@@ -64,54 +69,16 @@ const data = {
             url: "/dashboard/invoices",
             icon: IconInvoice,
         },
-    ],
-    navClouds: [
+        // {
+        //     title: "Users",
+        //     url: "/dashboard/users",
+        //     icon: IconUsers,
+        // },
         {
-            title: "Capture",
-            icon: IconCamera,
-            isActive: true,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Proposal",
-            icon: IconFileDescription,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Prompts",
-            icon: IconFileAi,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
+            title: "Audit Logs",
+            url: "/dashboard/audit-logs",
+            icon: IconListDetails,
+        }
     ],
     navSecondary: [
         {
@@ -128,23 +95,6 @@ const data = {
             title: "Search",
             url: "#",
             icon: IconSearch,
-        },
-    ],
-    documents: [
-        {
-            name: "Data Library",
-            url: "#",
-            icon: IconDatabase,
-        },
-        {
-            name: "Reports",
-            url: "#",
-            icon: IconReport,
-        },
-        {
-            name: "Word Assistant",
-            url: "#",
-            icon: IconFileWord,
         },
     ],
 };
@@ -170,6 +120,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
+                <hr className="w-full border border-border" />
                 <NavMain
                     items={data.navMain.map((item) => ({
                         ...item,
