@@ -5,10 +5,12 @@ import {
     text,
     timestamp,
     pgEnum,
-    doublePrecision, boolean, index
+    doublePrecision,
+    boolean,
+    index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { OrderStatus } from "@/enums";
+import { OrderStatus, NotificationProvider } from "@/enums";
 
 export const categoriesTable = pgTable("categories", {
     id: serial("id").primaryKey(),
@@ -41,10 +43,21 @@ export const orderStatusEnum = pgEnum("status", [
     OrderStatus.Finished,
 ]);
 
+export const notificationEnum = pgEnum("notification_provider", [
+    NotificationProvider.Discord,
+]);
+
 export const deliveryMethodEnum = pgEnum("delivery_method", [
     "delivery",
     "pickup",
 ]);
+
+export const notificationsTable = pgTable("notifications", {
+    id: serial("id").primaryKey(),
+    provider: notificationEnum("provider").notNull(),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
 export const customersTable = pgTable("customers", {
     id: serial("id").primaryKey(),
@@ -148,7 +161,7 @@ export const session = pgTable(
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),
     },
-    (table) => [index("session_userId_idx").on(table.userId)],
+    (table) => [index("session_userId_idx").on(table.userId)]
 );
 
 export const account = pgTable(
@@ -172,7 +185,7 @@ export const account = pgTable(
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
     },
-    (table) => [index("account_userId_idx").on(table.userId)],
+    (table) => [index("account_userId_idx").on(table.userId)]
 );
 
 export const verification = pgTable(
@@ -188,7 +201,7 @@ export const verification = pgTable(
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
     },
-    (table) => [index("verification_identifier_idx").on(table.identifier)],
+    (table) => [index("verification_identifier_idx").on(table.identifier)]
 );
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -209,7 +222,6 @@ export const accountRelations = relations(account, ({ one }) => ({
         references: [user.id],
     }),
 }));
-
 
 export type InsertProduct = typeof productsTable.$inferInsert;
 export type SelectProduct = typeof productsTable.$inferSelect;

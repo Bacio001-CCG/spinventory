@@ -21,3 +21,7 @@ export enum AuditLogAction {
     Logout = "logout",
     Signup = "signup",
 }
+
+export enum NotificationProvider {
+    Discord = "discord",
+}
